@@ -6,6 +6,7 @@
 
 #include"catch.hpp"
 #include"DFA.h"
+#include"EN-DFA.h"
 
 TEST_CASE("DFA-Words that start with 0 and end in 1") {
     DFA dfa;
@@ -118,4 +119,68 @@ TEST_CASE("N-DFA-Words that only contain 'a' or words of the form 'ab'*") {
     REQUIRE(ndfa.valid("a", 1) == true);
     REQUIRE(ndfa.valid("ababababab", 1) == true);
     REQUIRE(ndfa.valid("bababab", 1) == false);
+}
+
+
+TEST_CASE("EN-DFA-All words that end in 0 or that contain only 1s") {
+    EN_DFA endfa;
+    endfa.add_edge(1, 1, '1');
+    endfa.add_epsilon_edge(2, 1);
+    endfa.add_epsilon_edge(2, 3);
+    endfa.add_edge(3, 3, '0');
+    endfa.add_edge(3, 3, '1');
+    endfa.add_edge(3, 4, '0');
+    endfa.set_final(1);
+    endfa.set_final(4);
+    REQUIRE(endfa.valid("1110101101", 2) == false);
+    REQUIRE(endfa.valid("0001010", 2) == true);
+    REQUIRE(endfa.valid("11111110", 2) == true);
+    REQUIRE(endfa.valid("0000000001", 2) == false);
+    REQUIRE(endfa.valid("11111111111", 2) == true);
+    REQUIRE(endfa.valid("11101111111", 2) == false);
+}
+
+TEST_CASE("EN-DFA-Words that only contain 'a' or words of the form 'ab'*") {
+    EN_DFA endfa;
+    endfa.add_epsilon_edge(1, 2);
+    endfa.add_edge(2, 2, 'a');
+    endfa.add_epsilon_edge(1, 3);
+    endfa.add_edge(3, 4, 'a');
+    endfa.add_edge(4, 5, 'b');
+    endfa.add_epsilon_edge(5, 3);
+    endfa.set_final(2);
+    endfa.set_final(5);
+    REQUIRE(endfa.valid("ababbab", 1) == false);
+    REQUIRE(endfa.valid("aaaaaa", 1) == true);
+    REQUIRE(endfa.valid("a", 1) == true);
+    REQUIRE(endfa.valid("ababababab", 1) == true);
+    REQUIRE(endfa.valid("bababab", 1) == false);
+}
+
+
+TEST_CASE("EN-DFA-Words that have either the numbers of 0's odd or the number of 1's not a multiple of 3, or both ") {
+    EN_DFA endfa;
+    endfa.add_epsilon_edge(1, 2);
+    endfa.add_edge(2, 3, '0');
+    endfa.add_edge(2, 2, '1');
+    endfa.add_edge(3, 2, '0');
+    endfa.add_edge(3, 3, '1');
+    endfa.add_epsilon_edge(1, 4);
+    endfa.add_edge(4, 4, '0');
+    endfa.add_edge(4, 5, '1');
+    endfa.add_edge(5, 6, '1');
+    endfa.add_edge(6, 4, '1');
+    endfa.add_edge(6, 6, '0');
+    endfa.add_edge(5, 5, '0');
+    endfa.set_final(3);
+    endfa.set_final(5);
+    endfa.set_final(6);
+
+    REQUIRE(endfa.valid("000", 1) == true);
+    REQUIRE(endfa.valid("0000", 1) == false);
+    REQUIRE(endfa.valid("010110", 1) == true);
+    REQUIRE(endfa.valid("111111", 1) == false);
+    REQUIRE(endfa.valid("1101111", 1) == true);
+    REQUIRE(endfa.valid("1100", 1) == true);
+    REQUIRE(endfa.valid("11001", 1) == false);
 }
