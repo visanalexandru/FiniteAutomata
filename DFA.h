@@ -7,6 +7,7 @@
 
 #include<map>
 #include<vector>
+#include<algorithm>
 #include"N_DFA.h"
 
 // This class implements a deterministic finite automaton
@@ -14,11 +15,16 @@
 class DFA : public N_DFA {
 public:
     //Checks if the given word is accepted by the DFA.
-    bool valid(const std::string &word, state start) override;
+    Result valid(const std::string &word, state start) override;
 };
 
-bool DFA::valid(const std::string &word, state start) {
+DFA::Result DFA::valid(const std::string &word, state start) {
     state current = start;
+
+    // previous[state]-the previous state in the dfa path to a final node.
+    std::map<std::pair<state, unsigned>, state> previous;
+    unsigned depth = 1;
+
     for (letter x: word) {
         bool found = false;
 
@@ -26,17 +32,35 @@ bool DFA::valid(const std::string &word, state start) {
         for (const Edge &edge: graph[current]) {
             if (edge.transition == x) {
                 found = true;
+                previous[{edge.next, depth++}] = current;
                 current = edge.next;
                 break;
             }
         }
         //If we didn't find any edge for the current symbol, reject the word.
         if (!found) {
-            return false;
+            return {false, {}};
         }
     }
-    //We reached the end, the current state must be a final state.
-    return final[current];
+
+    // If the current state is not final, the word is not accepted.
+    if (!final[current]) {
+        return {false, {}};
+    }
+
+    //Rebuild the path
+    std::vector<state> path;
+    state now = current;
+    unsigned current_depth = word.size();
+    while (current_depth > 0) {
+        path.push_back(now);
+        now = previous[{now, current_depth}];
+        current_depth--;
+    }
+    path.push_back(start);
+    std::reverse(path.begin(), path.end());
+
+    return {true, path};
 }
 
 #endif //FINITE_AUTOMATA_DFA_H

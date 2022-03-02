@@ -11,9 +11,27 @@
 
 // This class implements a non-deterministic finite automaton
 class N_DFA {
-protected:
+
+public:
     typedef int state;
     typedef char letter;
+
+    /* This structure is returned from the valid method of the ndfa.*/
+    struct Result {
+        bool valid; /* if the word is valid. */
+        std::vector<state> path; /* the path in the ndfa graph.*/
+    };
+
+    //Adds an edge into the graph.
+    void add_edge(state a, state b, letter s);
+
+    //Marks the given state as final.
+    void set_final(state x);
+
+    //Checks if the given word is accepted by the N_DFA.
+    virtual Result valid(const std::string &word, state start);
+
+protected:
     struct Edge {
         state next;
         letter transition;
@@ -28,16 +46,6 @@ protected:
     //takes a state and a transition and adds all the states we can visit
     //using the given transition from the given state into the given set.
     void add_neighbours(state x, letter transition, std::set<state> &next);
-
-public:
-    //Adds an edge into the graph.
-    void add_edge(state a, state b, letter s);
-
-    //Marks the given state as final.
-    void set_final(state x);
-
-    //Checks if the given word is accepted by the N_DFA.
-    virtual bool valid(const std::string &word, state start);
 };
 
 void N_DFA::add_neighbours(state x, letter transition, std::set<state> &next) {
@@ -57,9 +65,13 @@ void N_DFA::set_final(state x) {
     final[x] = true;
 }
 
-bool N_DFA::valid(const std::string &word, state start) {
+N_DFA::Result N_DFA::valid(const std::string &word, state start) {
     // The set of current states.
     std::set<state> states = {start};
+
+    // previous[state]-the previous state in the dfa path to a final node.
+    std::map<std::pair<state, unsigned>, state> previous;
+    unsigned depth = 1;
 
     for (letter x: word) {
 
@@ -68,24 +80,50 @@ bool N_DFA::valid(const std::string &word, state start) {
 
         // Iterate through all the current states.
         for (state s: states) {
-            add_neighbours(s, x, next);
+            for (Edge edge: graph[s]) {
+                if (edge.transition == x) {
+                    next.insert(edge.next);
+                    previous[{edge.next, depth}] = s;
+                }
+            }
         }
 
         if (next.empty()) { // if there are no potential matches, reject the pattern.
-            return false;
+            return {false, {}};
         }
 
         // The next set of states become the current set of states.
         states.swap(next);
+        depth++;
     }
+
+    bool found = false;
+    state final_state; //Choose a random final state to rebuild the path.
     // Now we need to check if at least one state is final.
     for (state s: states) {
         if (final[s]) {
-            return true;
+            found = true;
+            final_state = s;
+            break;
         }
     }
     // We did not find any final states, reject the pattern.
-    return false;
+    if (!found) {
+        return {false, {}};
+    }
+
+    std::vector<state> path;
+    state now = final_state;
+    unsigned current_depth = word.size();
+    while (current_depth > 0) {
+        path.push_back(now);
+        now = previous[{now, current_depth}];
+        current_depth--;
+    }
+    path.push_back(start);
+    std::reverse(path.begin(), path.end());
+
+    return {true, path};
 }
 
 #endif //FINITE_AUTOMATA_N_DFA_H

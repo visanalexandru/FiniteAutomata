@@ -23,7 +23,7 @@ public:
     void add_epsilon_edge(state a, state b);
 
     //Checks if the given word is accepted by the EN_DFA.
-    bool valid(const std::string &word, state start) override;
+    Result valid(const std::string &word, state start) override;
 };
 
 void EN_DFA::add_epsilon_edge(state a, state b) {
@@ -39,7 +39,7 @@ void EN_DFA::add_epsilon_neighbours(state x, std::set<state> &next) {
     }
 }
 
-bool EN_DFA::valid(const std::string &word, state start) {
+EN_DFA::Result EN_DFA::valid(const std::string &word, state start) {
 
     std::set<state> states = {start};
     add_epsilon_neighbours(start, states);
@@ -63,7 +63,7 @@ bool EN_DFA::valid(const std::string &word, state start) {
         next.insert(epsilon_next.begin(), epsilon_next.end());
 
         if (next.empty()) { // if there are no potential matches, reject the pattern.
-            return false;
+            return {false, {}};
         }
         // The next set of states become the current set of states.
         states.swap(next);
@@ -72,11 +72,11 @@ bool EN_DFA::valid(const std::string &word, state start) {
     // Now we need to check if at least one state is final.
     for (state s: states) {
         if (final[s]) {
-            return true;
+            return {true, {}};
         }
     }
     // We did not find any final states, reject the pattern.
-    return false;
+    return {false, {}};
 }
 
 
