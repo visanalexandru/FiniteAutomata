@@ -14,8 +14,9 @@ private:
     /* From a given state, we can reach other states without consuming
      * any tokens using epsilon-edges. This method adds all the states
      * that are reachable from this state by epsilon-edges to the set
-     * using a breadth-first search.*/
-    void add_epsilon_neighbours(state x, std::set<state> &next);
+     * using a breadth-first search. It also updates the "previous" map.*/
+    void add_epsilon_neighbours(state x, std::set<state> &next, std::map<std::pair<state, unsigned>, state> &previous,
+                                state origin, unsigned depth);
 
 public:
 
@@ -30,34 +31,42 @@ void EN_DFA::add_epsilon_edge(state a, state b) {
     epsilon_edges[a].push_back(b);
 }
 
-void EN_DFA::add_epsilon_neighbours(state x, std::set<state> &next) {
+void
+EN_DFA::add_epsilon_neighbours(state x, std::set<state> &next, std::map<std::pair<state, unsigned>, state> &previous,
+                               state origin, unsigned depth) {
     for (state neighbour: epsilon_edges[x]) {
         if (next.find(neighbour) == next.end()) { // We only process the state if it is not already in the set.
             next.insert(neighbour);
-            add_epsilon_neighbours(neighbour, next);
+            previous[{neighbour, depth}] = origin;
+            add_epsilon_neighbours(neighbour, next, previous, origin, depth);
         }
     }
 }
 
 EN_DFA::Result EN_DFA::valid(const std::string &word, state start) {
 
+    // previous[state]-the previous state in the en-dfa path to a final node.
+    std::map<std::pair<state, unsigned>, state> previous;
+    unsigned depth = 1;
+
     std::set<state> states = {start};
-    add_epsilon_neighbours(start, states);
+    add_epsilon_neighbours(start, states, previous, start, 0);
 
     for (letter x: word) {
-
         // The set for the next iteration of states.
         std::set<state> next;
-
-        // Iterate through all the current states.
-        for (state s: states) {
-            add_neighbours(s, x, next);
-        }
-
-        // Now that we have states we can reach by consuming a token, we add their epsilon-neighbours.
+        //Add epsilon neighbours in this set, and then merge the two.
         std::set<state> epsilon_next;
-        for (state s: next) {
-            add_epsilon_neighbours(s, epsilon_next);
+
+        // Iterate through all the current states and add their neighbours.
+        for (state s: states) {
+            for (Edge edge: graph[s]) {
+                if (edge.transition == x) {
+                    next.insert(edge.next);
+                    previous[{edge.next, depth}] = s;
+                    add_epsilon_neighbours(edge.next, epsilon_next, previous, s, depth);
+                }
+            }
         }
 
         next.insert(epsilon_next.begin(), epsilon_next.end());
@@ -67,16 +76,38 @@ EN_DFA::Result EN_DFA::valid(const std::string &word, state start) {
         }
         // The next set of states become the current set of states.
         states.swap(next);
+        depth++;
     }
 
+    bool found = false;
+    state final_state; //Choose a random final state to rebuild the path.
     // Now we need to check if at least one state is final.
     for (state s: states) {
         if (final[s]) {
-            return {true, {}};
+            found = true;
+            final_state = s;
+            break;
         }
     }
+
     // We did not find any final states, reject the pattern.
-    return {false, {}};
+    if (!found) {
+        return {false, {}};
+    }
+
+    std::vector<state> path;
+    state now = final_state;
+    unsigned current_depth = word.size();
+
+    while (current_depth > 0) {
+        path.push_back(now);
+        now = previous[{now, current_depth}];
+        current_depth--;
+    }
+    path.push_back(start);
+    std::reverse(path.begin(), path.end());
+
+    return {true, path};
 }
 
 

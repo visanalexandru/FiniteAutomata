@@ -145,9 +145,12 @@ TEST_CASE("EN-DFA-All words that end in 0 or that contain only 1s") {
     endfa.set_final(4);
     REQUIRE(endfa.valid("1110101101", 2).valid == false);
     REQUIRE(endfa.valid("0001010", 2).valid == true);
+    REQUIRE(endfa.valid("0001010", 2).path == std::vector<int>{2, 3, 3, 3, 3, 3, 3, 4});
     REQUIRE(endfa.valid("11111110", 2).valid == true);
+    REQUIRE(endfa.valid("11111110", 2).path == std::vector<int>{2, 3, 3, 3, 3, 3, 3, 3, 4});
     REQUIRE(endfa.valid("0000000001", 2).valid == false);
     REQUIRE(endfa.valid("11111111111", 2).valid == true);
+    REQUIRE(endfa.valid("11111111111", 2).path == std::vector<int>{2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1});
     REQUIRE(endfa.valid("11101111111", 2).valid == false);
 }
 
@@ -163,8 +166,11 @@ TEST_CASE("EN-DFA-Words that only contain 'a' or words of the form 'ab'*") {
     endfa.set_final(5);
     REQUIRE(endfa.valid("ababbab", 1).valid == false);
     REQUIRE(endfa.valid("aaaaaa", 1).valid == true);
+    REQUIRE(endfa.valid("aaaaaa", 1).path == std::vector<int>{1, 2, 2, 2, 2, 2, 2});
     REQUIRE(endfa.valid("a", 1).valid == true);
+    REQUIRE(endfa.valid("a", 1).path == std::vector<int>{1, 2});
     REQUIRE(endfa.valid("ababababab", 1).valid == true);
+    REQUIRE(endfa.valid("ababababab", 1).path == std::vector<int>{1, 4, 3, 4, 3, 4, 3, 4, 3, 4, 5});
     REQUIRE(endfa.valid("bababab", 1).valid == false);
 }
 
@@ -188,10 +194,13 @@ TEST_CASE("EN-DFA-Words that have either the numbers of 0's odd or the number of
     endfa.set_final(6);
 
     REQUIRE(endfa.valid("000", 1).valid == true);
+    REQUIRE(endfa.valid("000", 1).path == std::vector<int>{1, 3, 2, 3});
     REQUIRE(endfa.valid("0000", 1).valid == false);
     REQUIRE(endfa.valid("010110", 1).valid == true);
+    REQUIRE(endfa.valid("010110", 1).path == std::vector<int>{1, 3, 3, 2, 2, 2, 3});
     REQUIRE(endfa.valid("111111", 1).valid == false);
     REQUIRE(endfa.valid("1101111", 1).valid == true);
+    REQUIRE(endfa.valid("1101111", 1).path == std::vector<int>{1, 2, 2, 3, 3, 3, 3, 3});
     REQUIRE(endfa.valid("1100", 1).valid == true);
     REQUIRE(endfa.valid("11001", 1).valid == false);
 }

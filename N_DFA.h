@@ -41,20 +41,8 @@ protected:
 
     // This map holds information on whether a state is a final state or not.
     std::map<state, bool> final;
-
-    //In an N_DFA, we can have multiple transitions with the same letter. This method
-    //takes a state and a transition and adds all the states we can visit
-    //using the given transition from the given state into the given set.
-    void add_neighbours(state x, letter transition, std::set<state> &next);
 };
 
-void N_DFA::add_neighbours(state x, letter transition, std::set<state> &next) {
-    for (Edge edge: graph[x]) {
-        if (edge.transition == transition) {
-            next.insert(edge.next);
-        }
-    }
-}
 
 void N_DFA::add_edge(state a, state b, letter s) {
     graph[a].push_back({b, s});
@@ -69,7 +57,7 @@ N_DFA::Result N_DFA::valid(const std::string &word, state start) {
     // The set of current states.
     std::set<state> states = {start};
 
-    // previous[state]-the previous state in the dfa path to a final node.
+    // previous[state]-the previous state in the ndfa path to a final node.
     std::map<std::pair<state, unsigned>, state> previous;
     unsigned depth = 1;
 
