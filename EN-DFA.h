@@ -1,10 +1,12 @@
 //
 // Created by visan on 2/26/22.
 //
-#include"N_DFA.h"
 
 #ifndef FINITE_AUTOMATA_EN_DFA_H
 #define FINITE_AUTOMATA_EN_DFA_H
+
+#include"N_DFA.h"
+#include<algorithm>
 
 class EN_DFA : public N_DFA {
 private:
