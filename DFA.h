@@ -8,11 +8,11 @@
 #include<map>
 #include<vector>
 #include<algorithm>
-#include"N_DFA.h"
+#include"NFA.h"
 
 // This class implements a deterministic finite automaton
-// Derives from N_DFA
-class DFA : public N_DFA {
+// Derives from NFA
+class DFA : public NFA {
 public:
     //Checks if the given word is accepted by the DFA.
     Result valid(const std::string &word, state start) override;

@@ -73,7 +73,7 @@ TEST_CASE("DFA-Words that start with 0 and have an odd length, or words that sta
 }
 
 TEST_CASE("N-DFA-Words that contain 00 or 11 as a substring") {
-    N_DFA ndfa;
+    NFA ndfa;
     ndfa.add_edge(1, 1, '0');
     ndfa.add_edge(1, 1, '1');
     ndfa.add_edge(1, 2, '0');
@@ -95,7 +95,7 @@ TEST_CASE("N-DFA-Words that contain 00 or 11 as a substring") {
 }
 
 TEST_CASE("N-DFA-Words that end with 101") {
-    N_DFA ndfa;
+    NFA ndfa;
     ndfa.add_edge(1, 1, '0');
     ndfa.add_edge(1, 1, '1');
     ndfa.add_edge(1, 2, '1');
@@ -113,7 +113,7 @@ TEST_CASE("N-DFA-Words that end with 101") {
 }
 
 TEST_CASE("N-DFA-Words that only contain 'a' or words of the form 'ab'*") {
-    N_DFA ndfa;
+    NFA ndfa;
     ndfa.add_edge(1, 2, 'a');
     ndfa.add_edge(2, 2, 'a');
     ndfa.add_edge(1, 3, 'a');

@@ -2,24 +2,24 @@
 // Created by visan on 2/21/22.
 //
 
-#ifndef FINITE_AUTOMATA_N_DFA_H
-#define FINITE_AUTOMATA_N_DFA_H
+#ifndef FINITE_AUTOMATA_NFA_H
+#define FINITE_AUTOMATA_NFA_H
 
 #include<map>
 #include<vector>
 #include<set>
 
 // This class implements a non-deterministic finite automaton
-class N_DFA {
+class NFA {
 
 public:
     typedef int state;
     typedef char letter;
 
-    /* This structure is returned from the valid method of the ndfa.*/
+    /* This structure is returned from the valid method of the nfa.*/
     struct Result {
         bool valid; /* if the word is valid. */
-        std::vector<state> path; /* the path in the ndfa graph.*/
+        std::vector<state> path; /* the path in the nfa graph.*/
     };
 
     //Adds an edge into the graph.
@@ -28,7 +28,7 @@ public:
     //Marks the given state as final.
     void set_final(state x);
 
-    //Checks if the given word is accepted by the N_DFA.
+    //Checks if the given word is accepted by the NFA.
     virtual Result valid(const std::string &word, state start);
 
 protected:
@@ -44,20 +44,20 @@ protected:
 };
 
 
-void N_DFA::add_edge(state a, state b, letter s) {
+void NFA::add_edge(state a, state b, letter s) {
     graph[a].push_back({b, s});
 }
 
 
-void N_DFA::set_final(state x) {
+void NFA::set_final(state x) {
     final[x] = true;
 }
 
-N_DFA::Result N_DFA::valid(const std::string &word, state start) {
+NFA::Result NFA::valid(const std::string &word, state start) {
     // The set of current states.
     std::set<state> states = {start};
 
-    // previous[state]-the previous state in the ndfa path to a final node.
+    // previous[state]-the previous state in the nfa path to a final node.
     std::map<std::pair<state, unsigned>, state> previous;
     unsigned depth = 1;
 
@@ -114,4 +114,4 @@ N_DFA::Result N_DFA::valid(const std::string &word, state start) {
     return {true, path};
 }
 
-#endif //FINITE_AUTOMATA_N_DFA_H
+#endif //FINITE_AUTOMATA_NFA_H

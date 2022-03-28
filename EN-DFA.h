@@ -5,10 +5,10 @@
 #ifndef FINITE_AUTOMATA_EN_DFA_H
 #define FINITE_AUTOMATA_EN_DFA_H
 
-#include"N_DFA.h"
+#include"NFA.h"
 #include<algorithm>
 
-class EN_DFA : public N_DFA {
+class EN_DFA : public NFA {
 private:
     //The graph of epsilon-edges.
     std::map<state, std::vector<state>> epsilon_edges;
