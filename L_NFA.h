@@ -2,13 +2,13 @@
 // Created by visan on 2/26/22.
 //
 
-#ifndef FINITE_AUTOMATA_EN_DFA_H
-#define FINITE_AUTOMATA_EN_DFA_H
+#ifndef FINITE_AUTOMATA_L_NFA_H
+#define FINITE_AUTOMATA_L_NFA_H
 
 #include"NFA.h"
 #include<algorithm>
 
-class EN_DFA : public NFA {
+class L_NFA : public NFA {
 private:
     //The graph of epsilon-edges.
     std::map<state, std::vector<state>> epsilon_edges;
@@ -22,20 +22,20 @@ private:
 
 public:
 
-    //Adds a new epsilon_edge between the two given states to the EN_DFA.
+    //Adds a new epsilon_edge between the two given states to the L_NFA.
     void add_epsilon_edge(state a, state b);
 
-    //Checks if the given word is accepted by the EN_DFA.
+    //Checks if the given word is accepted by the L_NFA.
     Result valid(const std::string &word, state start) override;
 };
 
-void EN_DFA::add_epsilon_edge(state a, state b) {
+void L_NFA::add_epsilon_edge(state a, state b) {
     epsilon_edges[a].push_back(b);
 }
 
 void
-EN_DFA::add_epsilon_neighbours(state x, std::set<state> &next, std::map<std::pair<state, unsigned>, state> &previous,
-                               state origin, unsigned depth) {
+L_NFA::add_epsilon_neighbours(state x, std::set<state> &next, std::map<std::pair<state, unsigned>, state> &previous,
+                              state origin, unsigned depth) {
     for (state neighbour: epsilon_edges[x]) {
         if (next.find(neighbour) == next.end()) { // We only process the state if it is not already in the set.
             next.insert(neighbour);
@@ -45,7 +45,7 @@ EN_DFA::add_epsilon_neighbours(state x, std::set<state> &next, std::map<std::pai
     }
 }
 
-EN_DFA::Result EN_DFA::valid(const std::string &word, state start) {
+L_NFA::Result L_NFA::valid(const std::string &word, state start) {
 
     // previous[state]-the previous state in the en-dfa path to a final node.
     std::map<std::pair<state, unsigned>, state> previous;
@@ -113,4 +113,4 @@ EN_DFA::Result EN_DFA::valid(const std::string &word, state start) {
 }
 
 
-#endif //FINITE_AUTOMATA_EN_DFA_H
+#endif //FINITE_AUTOMATA_L_NFA_H

@@ -6,7 +6,7 @@
 
 #include"catch.hpp"
 #include"DFA.h"
-#include"EN-DFA.h"
+#include"L_NFA.h"
 
 TEST_CASE("DFA-Words that start with 0 and end in 1") {
     DFA dfa;
@@ -134,7 +134,7 @@ TEST_CASE("N-DFA-Words that only contain 'a' or words of the form 'ab'*") {
 
 
 TEST_CASE("EN-DFA-All words that end in 0 or that contain only 1s") {
-    EN_DFA endfa;
+    L_NFA endfa;
     endfa.add_edge(1, 1, '1');
     endfa.add_epsilon_edge(2, 1);
     endfa.add_epsilon_edge(2, 3);
@@ -155,7 +155,7 @@ TEST_CASE("EN-DFA-All words that end in 0 or that contain only 1s") {
 }
 
 TEST_CASE("EN-DFA-Words that only contain 'a' or words of the form 'ab'*") {
-    EN_DFA endfa;
+    L_NFA endfa;
     endfa.add_epsilon_edge(1, 2);
     endfa.add_edge(2, 2, 'a');
     endfa.add_epsilon_edge(1, 3);
@@ -176,7 +176,7 @@ TEST_CASE("EN-DFA-Words that only contain 'a' or words of the form 'ab'*") {
 
 
 TEST_CASE("EN-DFA-Words that have either the numbers of 0's odd or the number of 1's not a multiple of 3, or both ") {
-    EN_DFA endfa;
+    L_NFA endfa;
     endfa.add_epsilon_edge(1, 2);
     endfa.add_edge(2, 3, '0');
     endfa.add_edge(2, 2, '1');

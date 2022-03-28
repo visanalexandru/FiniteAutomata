@@ -1,7 +1,7 @@
 #include <iostream>
 #include<fstream>
 #include"DFA.h"
-#include"EN-DFA.h"
+#include"L_NFA.h"
 
 
 void solve_dfa() {
